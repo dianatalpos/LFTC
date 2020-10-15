@@ -1,0 +1,19 @@
+Talpos Andrea Diana
+
+https://github.com/dianatalpos/LFTC
+
+Function position:
+    parameters: token - type: string represents the token you want to add
+    returns a MapEntry<Integer, Integer> which represent: the key: the hashcode position
+                                                        the value: the position of the token in the list from hashmap
+
+
+    This function returns:
+        if the token exists: return the position of the token
+        else: adds the token to the table and return the position.
+
+Function hashcode:
+    parameters: token - type: string
+    returns an int which represent the hashcode of the string
+
+    This function compute the sum of the ASCII code of every character in the string modulo 256
