@@ -12,6 +12,8 @@ Function position:
         if the token exists: return the position of the token
         else: adds the token to the table and return the position.
 
+
+
 Function hashcode:
     parameters: token - type: string
     returns an int which represent the hashcode of the string

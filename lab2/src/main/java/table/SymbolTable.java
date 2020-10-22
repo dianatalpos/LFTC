@@ -11,6 +11,8 @@ public class SymbolTable {
     private List<List<String>> elements;
 
 
+
+
     /*
      * This function returns the position of the token in the symbolTable
      */
