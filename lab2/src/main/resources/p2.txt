@@ -1,0 +1,13 @@
+a -> integer;
+b -> integer;
+c -> integer;
+Read a;
+Read b;
+While a != b then
+	If a = b then
+		c <- a;
+    If a > b then
+		a <- a-b;
+	else
+		b <- b-a;
+Write c;
