@@ -1,0 +1,10 @@
+a -> integer;
+b -> integer;
+c -> integer;
+Read a;
+Read b;
+If a < b then
+	c <- b;
+Else
+	c <- a;
+Write a;
