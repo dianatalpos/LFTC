@@ -7,4 +7,4 @@ If a < b then
 	c <- b;
 Else
 	c <- a;
-Write c;
+Write a;

@@ -12,6 +12,8 @@ import java.util.List;
 
 
 public class Scanner {
+    private static final String CODE_FOR_IDENTIFIER = "0";
+    private static final String CODE_FOR_CONSTANTS = "1";
     private final List<String> operators = Arrays.asList("+", "-", "*", "/", "=",
             "<", "<=", ">", ">=", "->", "<-", "!=", "[]", "[", "]");
     private final List<Character> separators = Arrays.asList(',', ';','{', '}', '(', ')');
@@ -32,53 +34,52 @@ public class Scanner {
 
     public void parse() {
         int line = 0;
-        List<Pair<String, Integer>> initial = new ArrayList<>();
+        List<Pair<String, Integer>> initialArrayWithTokens = new ArrayList<>();
         String e = "";
-        for (int j = 0; j < this.program.length(); j++) {
-            if (isSeparator(this.program.charAt(j))) {
-                initial.add(new Pair<>(e, line));
-                initial.add(new Pair<>(";", line));
+        for (int index = 0; index < this.program.length(); index++) {
+            if (isSeparator(this.program.charAt(index))) {
+                initialArrayWithTokens.add(new Pair<>(e, line));
+                initialArrayWithTokens.add(new Pair<>(";", line));
                 line++;
                 e = "";
-            } else if (this.program.charAt(j) != ' ' && !Character.isWhitespace(this.program.charAt(j))) {
-                e += this.program.charAt(j);
+            } else if (this.program.charAt(index) != ' ' && !Character.isWhitespace(this.program.charAt(index))) {
+                e += this.program.charAt(index);
             }
-            else if (this.program.charAt(j) == ' ' && e.length() > 0) {
-                initial.add(new Pair<>(e, line));
+            else if (this.program.charAt(index) == ' ' && !e.isEmpty()) {
+                initialArrayWithTokens.add(new Pair<>(e, line));
                 e = "";
-            } else if (Character.isWhitespace(this.program.charAt(j)) && e.length() > 0) {
-                initial.add(new Pair<>(e, line));
+            } else if (Character.isWhitespace(this.program.charAt(index)) && !e.isEmpty()) {
+                initialArrayWithTokens.add(new Pair<>(e, line));
                 line++;
                 e = "";
             }
         }
 
-        System.out.println(initial);
+        System.out.println(initialArrayWithTokens);
 
-        int s = 0;
-        while (s < initial.size()) {
-            String element = initial.get(s).getElement1();
-            Integer position = initial.get(s).getElement2();
+        int indexOfToken = 0;
+        while (indexOfToken < initialArrayWithTokens.size()) {
+            String element = initialArrayWithTokens.get(indexOfToken).getElement1();
+            Integer position = initialArrayWithTokens.get(indexOfToken).getElement2();
             String newString = "";
             if(!addToPif(element))
             {
                 List<Pair<String, Integer>> tokens = new ArrayList<>();
                 for (int i = 0; i < element.length(); i++) {
-                    if (newString.length() == 0) {
+                    if (newString.isEmpty()) {
                         newString = String.valueOf(element.charAt(i));
                     }
                     else if (isOperator(newString) || isSeparator(newString)) {
                         tokens.add(new Pair<>(newString, position));
-                        newString = "";
+                        newString = String.valueOf(element.charAt(i));
                     } else if (Character.isLetterOrDigit(newString.charAt(newString.length() - 1)) && Character.isLetterOrDigit(element.charAt(i)))
                         newString += String.valueOf(element.charAt(i));
                     else {
                         tokens.add(new Pair<>(newString, position));
                         newString = String.valueOf(element.charAt(i));
                     }
-
                 }
-                if (newString.length() > 0)
+                if (!newString.isEmpty())
                     tokens.add(new Pair<>(newString, position));
                 for (Pair<String, Integer> token: tokens
                      ) {
@@ -86,22 +87,25 @@ public class Scanner {
                         this.error.add("error at line: " + position + ", token: " + element);
                 }
             }
-            s++;
+            indexOfToken++;
         }
 
     }
 
     private boolean addToPif(String element) {
-        if (isOperator(element) || isSeparator(element) || isReservedWord(element))
-        {
+        if (isOperator(element) || isSeparator(element) || isReservedWord(element)) {
             this.pif.add(element, new Pair(-1, -1));
             return true;
-        }
-        else if (isIdentifier(element) || isConstant(element)){
+        } else if (isIdentifier(element) ){
             Pair pos = this.symbolTable.position(element);
-            this.pif.add(element, pos);
+            this.pif.add(CODE_FOR_IDENTIFIER, pos);
+            return true;
+        } else if(isConstant(element)){
+            Pair pos = this.symbolTable.position(element);
+            this.pif.add(CODE_FOR_CONSTANTS, pos);
             return true;
         }
+
         return false;
     }
 
@@ -123,42 +127,42 @@ public class Scanner {
         this.parse();
     }
 
-    public boolean isOperator(String s) {
-        return operators.contains(s);
+    public boolean isOperator(String token) {
+        return operators.contains(token);
     }
 
-    public boolean isConstant(String s){
-        if(s.equals("true") || s.equals("false"))
+    public boolean isConstant(String token){
+        if(token.equals("true") || token.equals("false"))
             return true;
-        return isAValidNumber(s);
+        return isAValidNumber(token);
     }
 
-    public boolean isIdentifier(String s) {
-        if (s.length() == 0)
+    public boolean isIdentifier(String token) {
+        if (token.isEmpty())
             return false;
-        if (!Character.isLetter(s.charAt(0)))
+        if (!Character.isLetter(token.charAt(0)))
             return false;
-        for (int i = 1; i < s.length(); i++) {
-            if (!Character.isLetter(s.charAt(i)))
+        for (int i = 1; i < token.length(); i++) {
+            if (!Character.isLetter(token.charAt(i)))
                 return false;
         }
         return true;
     }
 
-    public boolean isAValidNumber(String s) {
-        if (s.length() <= 1 && !Character.isDigit(s.charAt(0)))
+    public boolean isAValidNumber(String token) {
+        if (token.length() <= 1 && !Character.isDigit(token.charAt(0)))
             return false;
-        else if (!Character.isDigit(s.charAt(0)) && s.charAt(0) != '-' && s.charAt(0) != '+')
+        else if (!Character.isDigit(token.charAt(0)) && token.charAt(0) != '-' && token.charAt(0) != '+')
             return false;
-        for (int i = 1; i < s.length(); i++) {
-            if (!Character.isDigit(s.charAt(i)))
+        for (int i = 1; i < token.length(); i++) {
+            if (!Character.isDigit(token.charAt(i)))
                 return false;
         }
         return true;
     }
 
     public void printError(){
-        if(error.size() == 0)
+        if(error.isEmpty())
             System.out.println("Lexically correct!");
         else{
             error.forEach(System.out::println);
