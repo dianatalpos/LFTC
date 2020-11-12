@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Automata {
 
@@ -48,15 +49,15 @@ public class Automata {
 
         line = reader.readLine();
 
-        while(line!=null){
+        while (line != null) {
             String[] elements = line.split(",");
             final String initial = elements[0];
             final String finalState = elements[2];
             final String literal = elements[1];
-            if(!states.contains(initial) || !states.contains(finalState))
-                throw new FiniteAutonomaException("State doesn't exist: " + initial + " or "+ finalState);
+            if (!states.contains(initial) || !states.contains(finalState))
+                throw new FiniteAutonomaException("State doesn't exist: " + initial + " or " + finalState);
 
-            if(!alphabet.contains(literal))
+            if (!alphabet.contains(literal))
                 throw new FiniteAutonomaException("Literal doesn't exist: " + literal);
 
             Transition transition = new Transition(initial, literal, finalState);
@@ -69,13 +70,65 @@ public class Automata {
     }
 
 
-    public void verifySequence(String sequence){
+    public void verifySequence(String sequence) throws FiniteAutonomaException {
         List<String> literals = new ArrayList<>();
         literals.addAll(Arrays.asList(sequence.split(" ")));
+        List<Transition> currentTransitions = transitions;
+        List<String> currentStates = new ArrayList<>();
 
+        currentStates.add(initialState);
 
-        for(String currentLiteral: literals){
+        for(int i = 0; i<literals.size(); i++)
+        {
+            String currentLiteral = literals.get(i);
+            if (alphabet.contains(currentLiteral)) {
+
+                List<String> finalCurrentStates = currentStates;
+
+                currentTransitions = currentTransitions.stream()
+                        .filter(transition -> {
+                            for(String state: finalCurrentStates){
+                                if(transition.checkStartState(state) && transition.checkLiteral(currentLiteral))
+                                    return true;
+                            }
+                            return false;
+                        })
+                        .collect(Collectors.toList());
+
+                List<String> finalCurrentStates1 =currentTransitions.stream()
+                        .map(transition -> transition.getNextState())
+                        .collect(Collectors.toList());
+
+                currentTransitions = transitions.stream()
+                        .filter(transition -> {
+                            for(String state: finalCurrentStates1){
+                                if(transition.checkStartState(state))
+                                    return true;
+                            }
+                            return false;
+                        })
+                        .collect(Collectors.toList());
+
+                currentStates = finalCurrentStates1;
+
+                if(i != literals.size()-1 && currentTransitions.isEmpty())
+                    throw new FiniteAutonomaException("Sequence not accepted!");
+
+            } else
+                throw new FiniteAutonomaException("Sequence has wrong literals!");
+
         }
+
+        for(String state : currentStates)
+        {
+            for(String finalState: finalStates)
+                if(state.equals(finalState))
+                    System.out.println("Sequence accepted!");
+                    return;
+        }
+
+        System.out.println("Sequence not accepted!");
+
     }
 
     @Override

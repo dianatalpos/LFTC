@@ -46,7 +46,7 @@ public class Main {
                         System.out.println(automata.getTransitions());
                         break;
                     case 6:
-                        checkSequence();
+                        checkSequence(automata);
                         break;
                     case 0:
                         running = false;
@@ -60,8 +60,16 @@ public class Main {
         }
     }
 
-    private static void checkSequence() {
+    private static void checkSequence(Automata automata) {
+        System.out.println("Give sequence: ");
+        Scanner scanner = new Scanner(System.in);
+        String sequence = scanner.nextLine();
 
+        try{
+            automata.verifySequence(sequence);
+        } catch (FiniteAutonomaException e) {
+            System.out.println(e.message);
+        }
     }
 
     public static void main(String[] args) throws IOException {

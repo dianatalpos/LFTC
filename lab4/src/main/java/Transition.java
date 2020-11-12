@@ -35,6 +35,10 @@ public class Transition {
         this.nextState = nextState;
     }
 
+    public boolean checkStartState(String state){
+        return initialState.equals(state);
+    }
+
     @Override
     public String toString() {
         return "Transition{" +
@@ -42,5 +46,13 @@ public class Transition {
                 ", literal='" + literal + '\'' +
                 ", nextState='" + nextState + '\'' +
                 '}';
+    }
+
+    public boolean checkLiteral(String currentLiteral) {
+        return literal.equals(currentLiteral);
+    }
+
+    public boolean checkFinalState(String state) {
+        return nextState.equals(state);
     }
 }
