@@ -1,0 +1,86 @@
+program decllist cmpdstmt type identifier letter declaration arraydecl nr digit nonZeroDigit stmtlist stmt structstmt simplstmt assignstmt iostmt expression factor term whilestmt forstmt ifstmt condition word relation
+0 1 2 3 4 5 6 7 8 9 a b c d e f g h i j k l m n o p q r s t u v w x y z + - * = <= >= != / > < % { } [ ] ( ) ;; , vector or and if else read write for integer string start while finish return mod epsilon
+program
+program->start ;; decllist ;; cmpdstmt finish ;;
+decllist->declaration
+decllist->declaration ;; decllist
+declaration->type identifier
+type->string
+type->integer
+identifier->letter identifier
+letter->a
+letter->b
+letter->c
+letter->d
+letter->e
+letter->f
+letter->g
+letter->h
+letter->i
+letter->j
+letter->k
+letter->l
+letter->m
+letter->n
+letter->o
+letter->p
+letter->q
+letter->r
+letter->s
+letter->t
+letter->u
+letter->v
+letter->w
+letter->x
+letter->y
+letter->z
+arraydecl->type vector [ nr ]
+nr->digit nr
+nonZeroDigit->1
+nonZeroDigit->2
+nonZeroDigit->3
+nonZeroDigit->4
+nonZeroDigit->5
+nonZeroDigit->6
+nonZeroDigit->7
+nonZeroDigit->8
+nonZeroDigit->9
+digit->0
+digit->nonZeroDigit
+digit->nonZeroDigit digit
+cmpdstmt->[ stmtlist ]
+stmtlist->stmt
+stmtlist->stmt ;; stmtlist
+stmt->simplstmt
+stmt->structstmt
+simplstmt->assignstmt
+simplstmt->iostmt
+assignstmt->identifier = expression
+expression->expression + term
+expression->term
+expression->expression - term
+term->term * factor
+term->factor
+term->term / factor
+term->term mod factor
+factor->( expression )
+factor->identifier
+iostmt->read identifier
+iostmt->write identifier
+structstmt->cmpdstmt
+structstmt->ifstmt
+structstmt->forstmt
+structstmt->whilestmt
+ifstmt->if { condition } [ stmt ] [ else [ stmt ] ]
+whilestmt->while { condition } [ stmt ]
+forstmt->for { condition ;; condition ;; condition } [ stmt ]
+condition->expression relation expression
+condition->expression
+relation-><
+relation-><=
+relation->=
+relation->!=
+relation->>=
+relation->>
+word->letter word
+word->letter
