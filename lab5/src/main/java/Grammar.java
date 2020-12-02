@@ -8,7 +8,7 @@ public class Grammar {
     Set<String> nonTerminals;
     Set<String> terminals;
     String initialState;
-    Map<String, List<List<String>>> productions;
+    Map<String, List<Pair<Integer, List<String>>>> productions;
 
     public Grammar() {
         this.nonTerminals = new HashSet<>();
@@ -16,12 +16,12 @@ public class Grammar {
         this.initialState = "";
         this.productions = new HashMap<>();
 
-        readFromFile("src//main//resources//g2.txt");
+        readFromFile("src//main//resources//test2.txt");
     }
 
     public void readFromFile(String filename) {
         BufferedReader reader;
-
+        int i = 1;
         try {
             reader = new BufferedReader(new FileReader(filename));
             this.nonTerminals = new HashSet<>(Arrays.asList(reader.readLine().split(" ")));
@@ -30,18 +30,21 @@ public class Grammar {
 
             String line = reader.readLine();
             this.productions = new HashMap<>();
-            for(String nonTerminal : this.nonTerminals) {
+            for (String nonTerminal : this.nonTerminals) {
                 this.productions.put(nonTerminal, new ArrayList<>());
             }
 
             while (line != null) {
                 StringTokenizer stringTokenizer = new StringTokenizer(line, "->");
                 String symbol = stringTokenizer.nextToken().trim();
-                while(stringTokenizer.hasMoreTokens()) {
+                while (stringTokenizer.hasMoreTokens()) {
                     final String allElementsProduction = stringTokenizer.nextToken().trim();
                     ArrayList productionElements = new ArrayList();
                     productionElements.addAll(Arrays.asList(allElementsProduction.split(" ")));
-                    this.productions.get(symbol).add(productionElements);
+
+                    Pair element = new Pair(i, productionElements);
+                    this.productions.get(symbol).add(element);
+                    i++;
                 }
                 line = reader.readLine();
             }
@@ -63,11 +66,11 @@ public class Grammar {
         return initialState;
     }
 
-    public Map<String, List<List<String>>> getProductions() {
+    public Map<String, List<Pair<Integer, List<String>>>> getProductions() {
         return productions;
     }
 
-    public List<List<String>> getProductionsForNonTerminal(String nonTerminal) {
+    public List<Pair<Integer, List<String>>> getProductionsForNonTerminal(String nonTerminal) {
         return productions.get(nonTerminal);
     }
 }

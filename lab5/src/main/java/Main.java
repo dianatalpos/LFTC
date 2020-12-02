@@ -1,7 +1,4 @@
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -22,6 +19,8 @@ public class Main {
 
     private static void run() {
         Parser parser = new Parser(grammar);
+        parser.printTable();
+        Map<Derivation, Derivation> table =parser.parse("a*(a+a)");
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
 
@@ -79,10 +78,10 @@ public class Main {
     }
 
     private static void displayProductions() {
-        Map<String, List<List<String>>> productions = grammar.getProductions();
+        Map<String, List<Pair<Integer, List<String>>>> productions = grammar.getProductions();
         for(String nonTerminal : productions.keySet()) {
-            for(List<String> value: productions.get(nonTerminal)) {
-                String valueToPrint = value.stream().collect(Collectors.joining(" "));
+            for(Pair<Integer, List<String>> value: productions.get(nonTerminal)) {
+                String valueToPrint = value.element2.stream().collect(Collectors.joining(" "));
                 System.out.println(nonTerminal + " -> " + valueToPrint);
             }
             System.out.println();
@@ -95,9 +94,9 @@ public class Main {
         System.out.print("NonTerminal: ");
         String nonTerminal = scanner.nextLine();
 
-        List<List<String>> productions = grammar.getProductionsForNonTerminal(nonTerminal);
-        for(List<String> value: productions) {
-            String valueToPrint = value.stream().collect(Collectors.joining(" "));
+        List<Pair<Integer, List<String>>> productions = grammar.getProductionsForNonTerminal(nonTerminal);
+        for(Pair<Integer, List<String>> value: productions) {
+            String valueToPrint = value.element2.stream().collect(Collectors.joining(" "));
             System.out.println(nonTerminal + " -> " + valueToPrint);
         }
         System.out.println();
