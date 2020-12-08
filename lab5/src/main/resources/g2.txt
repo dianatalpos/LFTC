@@ -5,9 +5,11 @@ program->start ;; decllist ;; cmpdstmt finish ;;
 decllist->declaration
 decllist->declaration ;; decllist
 declaration->type identifier
+declaration->epsilon
 type->string
 type->integer
 identifier->letter identifier
+identifier->epsilon
 letter->a
 letter->b
 letter->c
@@ -35,7 +37,9 @@ letter->x
 letter->y
 letter->z
 arraydecl->type vector [ nr ]
+arraydecl->epsilon
 nr->digit nr
+nr->epsilon
 nonZeroDigit->1
 nonZeroDigit->2
 nonZeroDigit->3
@@ -49,13 +53,16 @@ digit->0
 digit->nonZeroDigit
 digit->nonZeroDigit digit
 cmpdstmt->[ stmtlist ]
+cmpdstmt->epsilon
 stmtlist->stmt
 stmtlist->stmt ;; stmtlist
+stmtlist->epsilon
 stmt->simplstmt
 stmt->structstmt
 simplstmt->assignstmt
 simplstmt->iostmt
 assignstmt->identifier = expression
+assignstmt->epsilon
 expression->expression + term
 expression->term
 expression->expression - term
@@ -72,8 +79,11 @@ structstmt->ifstmt
 structstmt->forstmt
 structstmt->whilestmt
 ifstmt->if { condition } [ stmt ] [ else [ stmt ] ]
+ifstmt->epsilon
 whilestmt->while { condition } [ stmt ]
+whilestmt->epsilon
 forstmt->for { condition ;; condition ;; condition } [ stmt ]
+forstmt->epsilon
 condition->expression relation expression
 condition->expression
 relation-><
