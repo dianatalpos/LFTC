@@ -1,3 +1,5 @@
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -7,12 +9,16 @@ public class Parser {
     private Map<String, Set<String>> first;
     private Map<String, Set<String>> follow;
     private Map<Pair<String, String>, Pair<Integer, List<String>>> table;
+    Map<Derivation, Derivation> derivationTable;
+    List<Pair<String, String>> conflicts;
 
-    public Parser(Grammar grammar) {
+    public Parser(Grammar grammar) throws ConflictException {
         this.grammar = grammar;
         first = new HashMap<>();
         follow = new HashMap<>();
         table = new HashMap<>();
+        derivationTable = new HashMap<>();
+
 
         first();
         follow();
@@ -24,12 +30,14 @@ public class Parser {
     }
 
     public Map<Derivation, Derivation> parse(String w) {
-        Map<Derivation, Derivation> derivationTable = new HashMap<>();
+        derivationTable = new HashMap<>();
+
+        String[] elements = w.split(" ");
 
         Stack<String> alpha = new Stack();
         alpha.push("$");
-        for (int i = w.length() - 1; i >= 0; i--)
-            alpha.push(String.valueOf(w.charAt(i)));
+        for (int i = elements.length - 1; i >= 0; i--)
+            alpha.push(String.valueOf(elements[i]));
 
 
         Stack<String> beta = new Stack();
@@ -89,7 +97,7 @@ public class Parser {
         return derivationTable;
     }
 
-    private void buildTable() {
+    private void buildTable() throws ConflictException {
         this.grammar.getNonTerminals().forEach(
                 nonTerminal -> {
                     this.grammar.getTerminals().forEach(terminal -> {
@@ -149,16 +157,22 @@ public class Parser {
                                 value = new Pair(element.element1, element.element2);
                             }
                         }
-
-                        this.table.put(key, value);
+                        Pair<Integer, List<String>> pair = this.table.get(key);
+//                        if(pair.element1!=null && pair.element2 != null)
+//                            throw new ConflictException("Conflict found: " + pair + " : " + key + "  " + value);
+                       this.table.put(key, value);
                     }
                 } else {
                     List<Pair<Integer, List<String>>> prod = this.grammar.getProductionsForNonTerminal(nonTerminal);
                     final Pair<String, String> key = new Pair<>(nonTerminal, terminal);
                     if (prod.size() == 1) {
                         Pair pair2 = this.table.get(key);
+//                        if(pair2.element1!=null && pair2.element2 != null)
+//                            throw new ConflictException("Conflict found: " + pair2 + " : " + key + "  " +  pair2);
+//
                         pair2.element2 = prod.get(0).element2;
                         pair2.element1 = prod.get(0).element1;
+
                         this.table.put(key, pair2);
                     } else {
                         Pair value = new Pair();
@@ -168,6 +182,9 @@ public class Parser {
                                 value.element2 = element.element2;
                             }
                         }
+                        Pair<Integer, List<String>> pair = this.table.get(key);
+//                        if(pair.element1!=null && pair.element2 != null)
+//                            throw new ConflictException("Conflict found: " + pair + " : " + key + "  " +  value);
 
                         this.table.put(key, value);
                     }
@@ -252,6 +269,19 @@ public class Parser {
     public void printTable() {
         table.entrySet().stream()
                 .forEach(System.out::println);
+    }
+
+    public void printTable(String filename) throws IOException {
+        FileWriter printer = new FileWriter(filename);
+
+        Derivation current = derivationTable.get(new Derivation());
+        while(current!=null && current.isNotEmpty()){
+            printer.append(current.toString() + "\n");
+            current = derivationTable.get(current);
+        }
+
+        printer.close();
+
     }
 }
 

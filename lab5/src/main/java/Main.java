@@ -1,10 +1,13 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class Main {
     private static Grammar grammar;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, ConflictException {
         grammar = new Grammar();
         run();
     }
@@ -17,12 +20,11 @@ public class Main {
         System.out.println("5 - Production for a given non-terminal");
     }
 
-    private static void run() {
-        Parser parser = new Parser(grammar);
-        parser.printTable();
-        Map<Derivation, Derivation> table =parser.parse("a*(a+a)");
+    private static void run() throws IOException, ConflictException {
         Scanner scanner = new Scanner(System.in);
         boolean running = true;
+
+        parseSequence1();
 
         while (running) {
             menu();
@@ -100,5 +102,16 @@ public class Main {
             System.out.println(nonTerminal + " -> " + valueToPrint);
         }
         System.out.println();
+    }
+
+    private static void parseSequence1() throws IOException, ConflictException {
+
+        BufferedReader reader;
+        reader = new BufferedReader(new FileReader("src//main//resources//seqtest2.txt"));
+        String sequence = reader.readLine();
+
+        Parser parser = new Parser(grammar);
+        parser.parse(sequence);
+        parser.printTable("out1.out");
     }
 }
